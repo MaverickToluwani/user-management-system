@@ -7,7 +7,8 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Response } from './dto/ResponseObj';
 import { HttpStatus } from '@nestjs/common';
 import { status } from './dto/StatusSwitchModel';
-import { DashboardMetric } from './dto/DashboardMetric'
+import { DashboardMetric } from './dto/DashboardMetric';
+import { FilterById } from './dto/FilterUserById';
 
 @Injectable()
 export class UsersService {
@@ -106,7 +107,7 @@ export class UsersService {
               ActiveUser.push(value);
             else
               InActiveUser.push(value);
-            
+
               Counter += 1;
           })
   
@@ -142,12 +143,114 @@ export class UsersService {
     }
   }
 
-  findAll() {
-    return `This action returns all users`;
+  async GetAllUsersAsync(){
+    const UserResponse = new Response<any>;
+
+    try{
+
+    
+    const user = await this.usersRepository.createQueryBuilder("user")
+        .select([
+          "user.FirstName",
+          "user.IsActive",
+          "user.CreateAt"
+        ]).getRawMany();
+
+        if (user.length > 0)
+        {
+          UserResponse.Data = user;
+          UserResponse.Message = "DashBoard Data";
+          UserResponse.StatusCode = HttpStatus.OK;
+          UserResponse.Success = true;  
+        }
+        else
+        {
+          UserResponse.Data = null;
+          UserResponse.Message = "No users";
+          UserResponse.StatusCode = HttpStatus.NOT_FOUND;
+          UserResponse.Success = false
+        }
+      
+        return UserResponse;
+    }
+    catch(e)
+    {
+      UserResponse.Data = e;
+      UserResponse.Message = "Error updating user";
+      UserResponse.StatusCode = HttpStatus.INTERNAL_SERVER_ERROR;
+      UserResponse.Success = false
+      return UserResponse;
+    }
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} user`;
+  async DeleteUserAsync(Data: FilterById) {
+
+    const UserResponse = new Response<any>;
+
+    try{
+
+
+      const existingUser = await this.usersRepository.findOne({ where: { id: Data.Id } });
+      existingUser.IsDeleted = true;
+      const IsUser = await this.usersRepository.save(existingUser);
+
+      if(IsUser)
+      {
+        UserResponse.Data = null;
+        UserResponse.Message = "User Deleted";
+        UserResponse.StatusCode = HttpStatus.OK;
+        UserResponse.Success = true;
+      }
+      else{
+          UserResponse.Data = null;
+          UserResponse.Message = "Error deleting user";
+          UserResponse.StatusCode = HttpStatus.NOT_FOUND;
+          UserResponse.Success = false
+      }
+      
+      return UserResponse;
+    }
+    catch(e)
+    {
+      UserResponse.Data = e;
+      UserResponse.Message = "Error updating user";
+      UserResponse.StatusCode = HttpStatus.INTERNAL_SERVER_ERROR;
+      UserResponse.Success = false
+      return UserResponse;
+    }
+  }
+
+  async GetUserByIdAsync(Id: string) {
+    const UserResponse = new Response<User>;
+    try
+    {  
+      const existingUser = await this.usersRepository.findOne({ where: { id:  Id} });
+
+      if(existingUser)
+      {
+        UserResponse.Data = existingUser;
+        UserResponse.Message = "User retrieved";
+        UserResponse.StatusCode = HttpStatus.OK;
+        UserResponse.Success = true;
+      }
+      else
+      {
+          UserResponse.Data = null;
+          UserResponse.Message = "Error retrieving user";
+          UserResponse.StatusCode = HttpStatus.NOT_FOUND;
+          UserResponse.Success = false
+      }
+      
+      return UserResponse;
+    }
+    catch(e)
+    {
+      UserResponse.Data = e;
+      UserResponse.Message = "Error updating user";
+      UserResponse.StatusCode = HttpStatus.INTERNAL_SERVER_ERROR;
+      UserResponse.Success = false
+      return UserResponse;
+    }
   }
 
   update(id: number, updateUserDto: UpdateUserDto) {

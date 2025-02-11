@@ -3,6 +3,8 @@ import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { status } from './dto/StatusSwitchModel';
+import { FilterById } from './dto/FilterUserById';
+
 
 @Controller('users')
 export class UsersController {
@@ -26,14 +28,19 @@ export class UsersController {
     return this.usersService.DashboardMetricAsync();
   }
 
-  @Get()
-  findAll() {
-    return this.usersService.findAll();
+  @Get('GetAllUsersDTO')
+  GetAllUsersAsync() {
+    return this.usersService.GetAllUsersAsync();
+  }
+
+  @Get("DeleteUser")
+  DeleteUser(@Body() Request: FilterById){
+    return this.usersService.DeleteUserAsync(Request);
   }
 
   @Get(':id')
   findOne(@Param('id') id: string) {
-    return this.usersService.findOne(+id);
+    return this.usersService.GetUserByIdAsync(id);
   }
 
   @Patch(':id')
