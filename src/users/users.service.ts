@@ -130,8 +130,6 @@ export class UsersService {
         }
       
         return UserResponse;
-        // console.log(user[0]);
-        // return user;
     }
     catch(e)
     {
