@@ -6,6 +6,8 @@ import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Response } from './dto/ResponseObj';
 import { HttpStatus } from '@nestjs/common';
+import { status } from './dto/StatusSwitchModel';
+import { DashboardMetric } from './dto/DashboardMetric'
 
 @Injectable()
 export class UsersService {
@@ -40,14 +42,104 @@ export class UsersService {
     catch(e){
       UserResponse.Data = e;
       UserResponse.Message = "Error Creating User";
-      UserResponse.StatusCode = HttpStatus.BAD_REQUEST;
+      UserResponse.StatusCode = HttpStatus.INTERNAL_SERVER_ERROR;
       UserResponse.Success = false
       return UserResponse;
     };
   }
 
-  ActiveSwitch(){
+  async UserStatusSwitcherAsync(mail: status){
+    const UserResponse = new Response<User>;
 
+
+    try{
+          const user = await this.usersRepository.createQueryBuilder()
+          .update(User)
+          .set({IsActive: true})
+          .where("Email = :Email", { Email: mail.Email})
+          .execute();
+
+          console.log(user);
+
+          if (user.affected > 0) 
+          {
+            UserResponse.Data = null;
+            UserResponse.Message = "User is now Active";
+            UserResponse.StatusCode = HttpStatus.OK;
+            UserResponse.Success = true;
+          } 
+          else 
+          {
+            UserResponse.Data = null;
+            UserResponse.Message = "Error updating user";
+            UserResponse.StatusCode = HttpStatus.BAD_REQUEST;
+            UserResponse.Success = false
+          }
+
+          return UserResponse;
+    }
+    catch(e)
+    {
+      UserResponse.Data = e;
+      UserResponse.Message = "Error updating user";
+      UserResponse.StatusCode = HttpStatus.INTERNAL_SERVER_ERROR;
+      UserResponse.Success = false
+      return UserResponse;
+    }
+  }
+
+  async DashboardMetricAsync(){
+    const UserResponse = new Response<DashboardMetric>;
+    const ActiveUser = [];
+    const InActiveUser = [];
+    var Counter = 0;
+    const DashBoardData = new DashboardMetric;
+
+    try{
+        const user = await this.usersRepository.find();
+
+        if (user.length > 0)
+        {
+          user.forEach((value: User) => {
+
+            if (value.IsActive == true)
+              ActiveUser.push(value);
+            else
+              InActiveUser.push(value);
+            
+              Counter += 1;
+          })
+  
+          DashBoardData.ActiveUser = ActiveUser;
+          DashBoardData.InActiveUser = InActiveUser;
+          DashBoardData.TotalUsers = Counter;
+  
+  
+          UserResponse.Data = DashBoardData;
+          UserResponse.Message = "DashBoard Data";
+          UserResponse.StatusCode = HttpStatus.OK;
+          UserResponse.Success = true;
+        }
+        else
+        {
+          UserResponse.Data = null;
+          UserResponse.Message = "No users";
+          UserResponse.StatusCode = HttpStatus.NOT_FOUND;
+          UserResponse.Success = false
+        }
+      
+        return UserResponse;
+        // console.log(user[0]);
+        // return user;
+    }
+    catch(e)
+    {
+      UserResponse.Data = e;
+      UserResponse.Message = "Error updating user";
+      UserResponse.StatusCode = HttpStatus.INTERNAL_SERVER_ERROR;
+      UserResponse.Success = false
+      return UserResponse;
+    }
   }
 
   findAll() {
