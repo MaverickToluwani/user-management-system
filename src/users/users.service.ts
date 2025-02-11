@@ -51,8 +51,6 @@ export class UsersService {
 
   async UserStatusSwitcherAsync(mail: status){
     const UserResponse = new Response<User>;
-
-
     try{
           const user = await this.usersRepository.createQueryBuilder()
           .update(User)
@@ -97,7 +95,9 @@ export class UsersService {
     const DashBoardData = new DashboardMetric;
 
     try{
-        const user = await this.usersRepository.find();
+        const user = await this.usersRepository.find({ 
+          where: {IsDeleted: false}
+        });
 
         if (user.length > 0)
         {
@@ -150,6 +150,7 @@ export class UsersService {
 
     
     const user = await this.usersRepository.createQueryBuilder("user")
+        .where({IsDeleted: false})
         .select([
           "user.FirstName",
           "user.IsActive",
@@ -188,8 +189,6 @@ export class UsersService {
     const UserResponse = new Response<any>;
 
     try{
-
-
       const existingUser = await this.usersRepository.findOne({ where: { id: Data.Id } });
       existingUser.IsDeleted = true;
       const IsUser = await this.usersRepository.save(existingUser);
@@ -224,7 +223,7 @@ export class UsersService {
     const UserResponse = new Response<User>;
     try
     {  
-      const existingUser = await this.usersRepository.findOne({ where: { id:  Id} });
+      const existingUser = await this.usersRepository.findOne({ where: { id:  Id, } });
 
       if(existingUser)
       {
@@ -251,13 +250,5 @@ export class UsersService {
       UserResponse.Success = false
       return UserResponse;
     }
-  }
-
-  update(id: number, updateUserDto: UpdateUserDto) {
-    return `This action updates a #${id} user`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} user`;
   }
 }
