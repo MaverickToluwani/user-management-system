@@ -4,7 +4,8 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { status } from './dto/StatusSwitchModel';
 import { FilterById } from './dto/FilterUserById';
-import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';;
+import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';import { PaginationDto } from './dto/pagination.dto';
+;
 
 
 @Controller('users')
@@ -38,8 +39,8 @@ export class UsersController {
   @Get('GetAllUsersDTO')
   @ApiOperation({ summary: 'Retrieve User ' }) // Swagger description
   @ApiResponse({ status: 200, description: 'Users Data retrieved successfully' })
-  GetAllUsersAsync() {
-    return this.usersService.GetAllUsersAsync();
+  GetAllUsersAsync(@Body() Pagination: PaginationDto) {
+    return this.usersService.GetAllUsersAsync(Pagination);
   }
 
   @Get("DeleteUser")

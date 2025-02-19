@@ -142,21 +142,32 @@ export class UsersService {
     }
   }
 
-  async GetAllUsersAsync(){
+  async GetAllUsersAsync(Pagination){
     const UserResponse = new Response<any>;
+    const dateQuery = Pagination.CreatedAtDate;
 
     try{
-
-    
-    const user = await this.usersRepository.createQueryBuilder("user")
+        const query = await this.usersRepository.createQueryBuilder("user")
         .where({IsDeleted: false})
         .select([
           "user.FirstName",
           "user.IsActive",
           "user.CreateAt"
-        ]).getRawMany();
+        ]).skip((Pagination.page - 1) * Pagination.limit)
+        .take(Pagination.limit);
 
-        if (user.length > 0)
+
+        if (Pagination.CreatedAtDate)
+        {
+          console.log("test");
+          await query.andWhere("DATE(user.CreateAt) = :CreateAt", { CreateAt: dateQuery })
+        }
+        // console.log(query);~
+        
+        const user = await query.getRawMany();
+        // console.log(user);
+
+        if (user)
         {
           UserResponse.Data = user;
           UserResponse.Message = "DashBoard Data";
