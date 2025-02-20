@@ -11,7 +11,7 @@ const app = await NestFactory.create(AppModule);
     .setTitle('My API')
     .setDescription('API documentation for my NestJS app')
     .setVersion('1.0')
-    .addBearerAuth() // Optional: Add JWT authentication
+    .addBearerAuth()
     .build();
 
   const document = SwaggerModule.createDocument(app, config);
