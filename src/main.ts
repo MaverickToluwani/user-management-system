@@ -6,7 +6,6 @@ async function bootstrap() {
 
 const app = await NestFactory.create(AppModule);
 
-  // ✅ Swagger Configuration
   const config = new DocumentBuilder()
     .setTitle('My API')
     .setDescription('API documentation for my NestJS app')
