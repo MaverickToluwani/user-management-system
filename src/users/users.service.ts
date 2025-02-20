@@ -153,19 +153,20 @@ export class UsersService {
           "user.FirstName",
           "user.IsActive",
           "user.CreateAt"
-        ]).skip((Pagination.page - 1) * Pagination.limit)
-        .take(Pagination.limit);
-
+        ]);
+        
+        if(Pagination.limit && Pagination.page)
+        {
+            query.skip((Pagination.page - 1) * Pagination.limit)
+              .take(Pagination.limit);
+        }
 
         if (Pagination.CreatedAtDate)
         {
-          console.log("test");
           await query.andWhere("DATE(user.CreateAt) = :CreateAt", { CreateAt: dateQuery })
         }
-        // console.log(query);~
         
         const user = await query.getRawMany();
-        // console.log(user);
 
         if (user)
         {
