@@ -60,9 +60,9 @@ http://localhost:3000/api/docs
 This provides a UI to test and explore all available endpoints.
 
 ## Contributors
-- **Toluwani Lekan-Afinni** - Role
-- **Jewel Eni** - Role
-- **Itang Itang Akanimo** - Role
+- **Toluwani Lekan-Afinni**
+- **Jewel Eni**
+- **Itang Itang Akanimo**
 - **Kelechi Ezemandu**
 - **Olawale Dipo-Isijola**
 - **Victor Adeyemi**
